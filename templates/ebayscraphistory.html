@@ -1,0 +1,48 @@
+{%extends "base.html"%}
+{%block header %}
+{{super()}}
+<link rel="stylesheet" href="@sweetalert2/themes/dark/dark.css">
+<style>
+    .swal2-cancel {
+        margin-right: 30px;
+    }
+</style>
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Stored Searches</h1>
+        </div>
+        <div class="row mt-5">
+            <div class="card mb-4 mt-3">
+                <div class="card-body">
+                    <table id="datatables" class="display dataTable" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th scope=" col" id="name">Name</th>
+                                <th scope="col" id="location">Location</th>
+                                <th scope="col" id="included">Included Locations</th>
+                                <th scope="col" id="condition">Conditions</th>
+                                <th scope="col" id="buy_format">Buy Format</th>
+                                <th scope="col" id="min_price">Min Price</th>
+                                <th scope="col" id="max_price">Max Price</th>
+                                <th scope="col" id="sold_item">Sold item</th>
+                                <th scope="col" id="scraped_record">Scraped Records</th>
+                                <th scope="col" id="scraped_every">Scrape Every</th>
+                                <th scope="col" id="scraped_at">Scraped at</th>
+                                <th scope="col" id="status">Status</th>
+                                <th scope="col" id="count_gap">New List Add</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+    </main>
+</div>
+{%endblock header%}
+{% block footer %}
+{{super()}}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{url_for('static', filename='js/ebayrequesthistory.js')}}"></script>
+{%endblock footer%}

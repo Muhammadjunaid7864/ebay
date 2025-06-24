@@ -1,0 +1,336 @@
+{% extends "base.html"%}
+{% block header %}
+{{ super() }}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+<div id="layoutSidenav_content" class="ms-3">
+    <main>
+
+        <div class="container-fluid px-4">
+            <div class="row">
+                {% if request_data %}
+                <div class="col-8">
+                    <h1 class="mt-4">eBay Search</h1>
+                </div>
+                <div class="col-4 mt-4" style="text-align: right;">
+                    <p id="hidden_request_id" hidden>{{request_data['request_id']}}</p>
+                    <button class="btn btn-primary" type="button" id="btn_update_search">Update</button>
+                    <a href="" id="export_href"><button class="btn btn-primary" type="button"
+                            id="btn_export_data">Export</button></a>
+                    <a href="" id="view_anchor_tag_after" target="_blank"><button class="btn btn-primary" type="button"
+                            id="btn_view_search_after">EBay url <i class="fa fa-external-link"></i></button></a>
+                </div>
+                {%else%}
+                <div class="col-9">
+                    <h1 class="mt-4">eBay Search</h1>
+                </div>
+                <div class="col-3  mt-4" style="text-align: right;">
+                    <button class="btn btn-primary disabled" type="button" id="btn_submit_search" data-bs-toggle="modal"
+                        data-bs-target="#save_request_data"="">Save</button>
+                    <a href="" id="view_anchor_tag" target="_blank"><button class="btn btn-primary" type="button"
+                            id="btn_view_search">eBay url <i class="fa fa-external-link"></i></button></a>
+                </div>
+                {%endif%}
+            </div>
+        </div>
+        <div>
+
+            <div class="row" id="main_row_filter">
+                {% if request_data %}
+                <div class="col-md-3">
+                    <label for="location" class="form-label text-center">Location</label>
+                    <div class="input-group">
+                        <select class="form-control item_location" id="location">
+                            {% if request_data["location_url"] == "98" %}
+                            <option selected="selected" value="98">Default</option>
+                            {%else%}
+                            <option value="98">Default</option>
+                            {%endif%}
+                            {%if request_data["location_url"] == "1" %}
+                            <option value="1" selected="selected">US Only</option>
+                            {%else%}
+                            <option value="1">US Only</option>
+                            {%endif%}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="exclude_location" class="form-label text-center">Included Locations</label>
+                    <p id="included_location_val_id" hidden>{{request_data['included_location_val']}}</p>
+                    <div class="input-group">
+
+                        <select class="form-control exclude_location" id="exclude_location_after" multiple="multiple">
+                            {% if request_data%}
+                            {%for i in range(location_list|length)%}
+                            <option value="{{location_list[i]['location']}}">{{location_list[i]['location']}}
+                            </option>
+                            {%endfor%}
+                            {%else%}
+                            <option value="United States">United States</option>
+                            {%endif %}
+                        </select>
+                        <div class="form-check form-switch mt-2">
+                            {%if request_data['include_exclude_btn'] == "United States2"%}
+                            <input class="form-check-input" type="checkbox" role="switch" id="switchincluded">
+                            {%else%}
+                            <input class="form-check-input" type="checkbox" role="switch" id="switchincluded" checked>
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="condition" class="form-label">Condition</label>
+                    <div class="input-group">
+                        <p id="condtion_val" hidden>{{request_data["condition_url_val"]}}</p>
+                        <select class="form-control item_condition" id="condition_after" multiple="multiple">
+                            <option value="1000">New</option>
+                            <option value="1500">Open box</option>
+                            <option value="2010">Excellent - Refurbished </option>
+                            <option value="2020">Very Good - Refurbished</option>
+                            <option value="2030">Good - Refurbished</option>
+                            <option value="3000">Used</option>
+                            <option value="1000">New with tags</option>
+                            <option value="1500">New without tags</option>
+                            <option value="1750">New with defects</option>
+                            <option value="3000">Per-owned</option>
+                            <option value="7000">For part or not working</option>
+                            <option value="10">Not specified</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="Buy_format" class="form-label">Buying Format</label>
+                    <div class="input-group">
+                        <select class="form-control item_buy_format" id="buy_format">
+                            {% if request_data["buy_format_url"] == 'LH_All=1' %}
+                            <option selected="selected" value="LH_All=1">All listings</option>
+                            {%else%}
+                            <option value="LH_All=1">All listings</option>
+                            {%endif %}
+                            {% if request_data["buy_format_url"] == 'LH_Auction=1'%}
+                            <option selected="selected" value="LH_Auction=1">Auction</option>
+                            {%else%}
+                            <option value="LH_Auction=1">Auction</option>
+                            {%endif %}
+                            {% if request_data["buy_format_url"] == 'LH_BIN=1'%}
+                            <option selected="selected" value="LH_BIN=1">Buy it now</option>
+                            {%else%}
+                            <option value="LH_BIN=1">Buy it now</option>
+                            {%endif %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-1">
+                    <label for="min" class="form-label">$ Min</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" value="{{request_data['min_price']}}" name="min"
+                            id="min">
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label for="max" class="form-label">$ Max</label>
+                    <div class="input-group">
+                        <input class="form-control" value="{{request_data['max_price']}}" type="text" name="max"
+                            id="max">
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label for="min_quantity" class="form-label">Min Qty</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" value="{{request_data['min_quantity']}}"
+                            id="min_quantity">
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label for="max_quantity" class="form-label">Max Qty</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" value="{{request_data['max_quantity']}}"
+                            id="max_quantity">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check input-group">
+                        {% if request_data['sold_item'] == "LH_Sold=1"%}
+                        <input style="margin-top: 38px;" type="checkbox" id="item_sold" value="LH_Sold=1" checked>
+                        <label for="item_sold" class="ms-2" style="margin-top: 38px;"> Sold item</label>
+                        {%else%}
+                        <input style="margin-top: 38px;" type="checkbox" id="item_sold" value="LH_Sold=1">
+                        <label for="item_sold" class="ms-2" style="margin-top: 38px;"> Sold item</label>
+                        {%endif%}
+                    </div>
+                </div>
+                <div class="col-md-6 mt-4">
+                    <div class="input-group">
+                        <input class="form-control" id="search_input" name="searchtext" type="text"
+                            value="{{request_data['request_name']}}" placeholder="Search for..." />
+                        <button type="button" class="btn btn-primary" id="btnNavbarSearch" type="button"><i
+                                class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                {%else%} <div class="col-md-3" id="div_location">
+                    <label for="location" class="form-label text-center">Location</label>
+                    <div class="input-group">
+                        <select class="form-control item_location" id="location">
+                            <option value="98">Default</option>
+                            <option value="1" selected="selected">US Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3" id="div_exclude_location">
+                    <label for="exclude_location" class="form-label text-center">Included Locations</label>
+                    <div class="input-group">
+                        <select class="form-control exclude_location" id="exclude_location" multiple="multiple">
+                            {%for i in range(location_list|length)%}
+                            <option value="{{location_list[i]['location']}}">{{location_list[i]['location']}}</option>
+                            {%endfor%}
+                        </select>
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" role="switch" id="switchincluded" checked>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" id="div_condition">
+                    <label for="condition" class="form-label">Condition</label>
+                    <div class="input-group">
+                        <select class="form-control item_condition" id="condition" multiple="multiple">
+                            <option value="1000">New</option>
+                            <option value="1500">Open box</option>
+                            <option value="2010">Excellent - Refurbished </option>
+                            <option value="2020">Very Good - Refurbished</option>
+                            <option value="2030">Good - Refurbished</option>
+                            <option value="1000">New with tags</option>
+                            <option value="1500">New without tags</option>
+                            <option value="1750">New with defects</option>
+                            <option value="3000">Per-owned</option>
+                            <option value="3000">Used</option>
+                            <option value="7000">For part or not working</option>
+                            <option value="10">Not specified</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3" id="div_buy_format">
+                    <label for="Buy_format" class="form-label">Buying Format</label>
+                    <div class="input-group">
+                        <select class="form-control item_buy_format" id="buy_format">
+                            <option selected="selected" value="LH_All=1">All listings</option>
+                            <option value="LH_Auction=1">Auction</option>
+                            <option value="LH_BIN=1">Buy it now</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-1" id="div_min">
+                    <label for="min" class="form-label">$ Min</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" name="min" id="min">
+                    </div>
+                </div>
+                <div class="col-md-1" id="div_max">
+                    <label for="max" class="form-label">$ Max</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" name="max" id="max">
+                    </div>
+                </div>
+                <div class="col-md-1" id="div_min_quantity">
+                    <label for="min_quantity" class="form-label">Min Qty</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" id="min_quantity">
+                    </div>
+                </div>
+                <div class="col-md-1" id="div_max_quantity">
+                    <label for="max_quqntity" class="form-label">Max Qty</label>
+                    <div class="input-group">
+                        <input class="form-control" type="text" id="max_quantity">
+                    </div>
+                </div>
+                <div class="col-md-2" id="div_item_sold">
+                    <div class="form-check input-group">
+                        <input style="margin-top: 38px;" type="checkbox" id="item_sold" value="LH_Sold=1">
+                        <label for="item_sold" class="ms-2" style="margin-top: 38px;"> Sold item</label>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-4" id="div_search_input">
+                    <div class="input-group">
+                        <input class="form-control" id="search_input" name="searchtext" type="text"
+                            placeholder="Search for..." />
+                        <button type="button" class="btn btn-primary disabled" id="btnNavbarSearch" type="button"><i
+                                class="fas fa-search"></i></button>
+                    </div>
+                </div>
+
+                {%endif%}
+
+            </div>
+        </div>
+
+        <!-- Navbar-->
+        <!--                        <div class="card mb-4">-->
+        <!--                            <div class="card-body">-->
+        <!--                                DataTables is a third party plugin that is used to generate the demo table below. For more information about DataTables, please visit the-->
+        <!--                                <a target="_blank" href="https://datatables.net/">official DataTables documentation</a>-->
+        <!--                                .-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+        <div class="card mb-4 mt-3">
+
+            <div class="card-body">
+                <div id="product-table-loading"></div>
+                <table id="datatables" class="display dataTable position-relative">
+                    <thead>
+                        <tr>
+                            <!-- <th>No#</th> -->
+                            <th>Image</th>
+                            <th>Product Title</th>
+                            <th>Price</th>
+                            <th>Condition</th>
+                            <th>location</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+</div>
+<div class="modal fade" id="save_request_data" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Set Scheduler</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <select class="form-select" aria-label="Default select example" id="scheduler_time">
+                        <option selected>Select Scheduler</option>
+                        <option value="1">1 hour</option>
+                        <option value="2">2 hour</option>
+                        <option value="4">4 hour</option>
+                        <option value="8">8 hour</option>
+                        <option value="16">16 hour</option>
+                        <option value="24">24 hour</option>
+                        <option value="48">48 hour</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>
+                <a href="" id="btn_save_link"><button class="btn btn-primary" type="button"
+                        id="btn_modal_save">Save</button></a>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+
+{% endblock header %}
+
+{% block footer %}
+{{super()}}
+<script src="{{url_for('static', filename='js/datatable.js')}}"></script>
+
+{%endblock%}
