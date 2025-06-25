@@ -8,7 +8,7 @@ import os
 
 DATABASE_URL = os.environ.get('DATABASE_URL', None)
 
-# DATABASE_URL = "postgres://zpnnjmyoygprxh:6efc3e6a7f94d509b40844ce3726173a409684ed6dd5347bc698599f4aa46737@ec2-54-211-177-159.compute-1.amazonaws.com:5432/d16bn63aq952mp"
+# DATABASE_URL = "postgres://zpnnjmyoygprxh:6efc3e6a7f94d509b40844ce3726173a409684ed6dd5347bc698599f4aa46737@ec2-54-**-**-159.compute-1.amazonaws.com:5432/d16bn63aq952mp"
 env = "local"
 # env = "production"
 # postgre config
